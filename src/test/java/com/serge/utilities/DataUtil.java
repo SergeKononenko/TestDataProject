@@ -2,14 +2,34 @@ package com.serge.utilities;
 
 import java.util.Hashtable;
 
+import org.testng.SkipException;
 import org.testng.annotations.DataProvider;
 
 public class DataUtil {
 
-	public static boolean isSuiteRunnable(String suiteName, ExcelReader excel) {
+	public static void checkExecution(String testSuiteName, String testCaseName,
+			String dataRunMode, ExcelReader excel) {
 
+		if (!isSuiteRunnable(testSuiteName)) {
+			throw new SkipException("Skipping the test " + testCaseName
+					+ " as Runmode of TestSuite " + testSuiteName.toUpperCase() + " is NO!");
+		}
+		if (!isTestRunnable(testCaseName, excel)) {
+			throw new SkipException("Skipping the testCase " + testCaseName
+					+ " as Runmode of TestCase is NO!");
+		}
+		if(dataRunMode.equalsIgnoreCase(Constants.RUNMODE_NO)) {
+			throw new SkipException("Skipping the testCase " + testCaseName
+					+ " as Runmode of dataSet is NO!");
+		}
+		
+	}
+
+	public static boolean isSuiteRunnable(String suiteName) {
+
+		ExcelReader excel = new ExcelReader(Constants.SUITE_XL_PATH);
 		int rows = excel.getRowCount(Constants.SUITE_SHEET);
-		for (int rowNum = 2; rowNum < rows; rowNum++) {
+		for (int rowNum = 2; rowNum <= rows; rowNum++) {
 			String data = excel.getCellData(Constants.SUITE_SHEET,
 					Constants.SUITENAME_COL, rowNum);
 			if (data.equals(suiteName)) {
@@ -30,13 +50,13 @@ public class DataUtil {
 
 		int rows = excel.getRowCount(Constants.TESTCASE_SHEET);
 
-		for (int rowNum = 2; rowNum < rows; rowNum++) {
+		for (int rowNum = 2; rowNum <= rows; rowNum++) {
 			String data = excel.getCellData(Constants.TESTCASE_SHEET,
 					Constants.TESTCASE_COL, rowNum);
-			if (data.equals(testCaseName)) {
+			if (data.equalsIgnoreCase(testCaseName)) {
 				String runMode = excel.getCellData(Constants.TESTCASE_SHEET,
 						Constants.RUNMODE_COL, rowNum);
-				if (runMode.equals(Constants.RUNMODE_YES)) {
+				if (runMode.equalsIgnoreCase(Constants.RUNMODE_YES)) {
 					return true;
 				} else
 					return false;
@@ -50,7 +70,7 @@ public class DataUtil {
 	public static Object[][] getData(String testCase, ExcelReader excel) {
 
 		int rowsTotal = excel.getRowCount(Constants.DATA_SHEET);
-		System.out.println("Total rows are: " + rowsTotal);
+		// System.out.println("Total rows are: " + rowsTotal);
 		String testName = testCase;
 
 // find test case start row
@@ -61,7 +81,7 @@ public class DataUtil {
 			if (testCaseName.equalsIgnoreCase(testName))
 				break;
 		}
-		System.out.println("Start row: " + testCaseRowNum);
+		// System.out.println("Start row: " + testCaseRowNum);
 
 // Checking total rows in TestCase		
 		int dataStartRowNum = testCaseRowNum + 2; // row where test data starts
@@ -70,7 +90,7 @@ public class DataUtil {
 				dataStartRowNum + testRows).equals("")) {
 			testRows++;
 		}
-		System.out.println("Num of Data rows: " + testRows);
+		// System.out.println("Num of Data rows: " + testRows);
 
 // Checking total columns in TestCase
 		int testCols = 0;
@@ -83,7 +103,7 @@ public class DataUtil {
 			testCols++;
 		}
 
-		System.out.println("Num of Data cols: " + testCols);
+		// System.out.println("Num of Data cols: " + testCols);
 
 //Getting Data
 		Object[][] data = new Object[testRows][1];
@@ -93,7 +113,7 @@ public class DataUtil {
 
 			Hashtable<String, String> table = new Hashtable<String, String>();
 
-			for (int cNum = 0; cNum <= testCols; cNum++) {
+			for (int cNum = 0; cNum < testCols; cNum++) {
 //				System.out.println(
 //						excel.getCellData(Constants.DATA_SHEET, cNum, rNum));
 
