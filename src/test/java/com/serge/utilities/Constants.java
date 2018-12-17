@@ -15,4 +15,9 @@ public class Constants {
 	public static String RUNMODE_YES = "y";
 	public static String RUNMODE_NO = "n";
 	
+	public static String SUITE1_XL_PATH = System.getProperty("user.dir")
+			+ "\\src\\test\\resources\\testdata\\BankManagersSuite.xlsx";
+	public static String SUITE2_XL_PATH = System.getProperty("user.dir")
+			+ "\\src\\test\\resources\\testdata\\CustomerSuite.xlsx";
+	
 }
